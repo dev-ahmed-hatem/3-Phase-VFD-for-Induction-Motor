@@ -27,17 +27,17 @@ volatile uint8_t dtA = 0, dtB = 0, dtC = 0;
 // Previous states
 volatile uint8_t prevA = 0, prevB = 0, prevC = 0;
 
-#define DEAD_TIME_CYCLES 0
+#define DEAD_TIME_CYCLES 1
 
 // Speed control
 volatile uint8_t speedDivider = 4;
 
 void setup() {
   // PWM pins
-  DDRB |= (1 << PB1) | (1 << PB2);  // Phase A
-  DDRD |= (1 << PD6) | (1 << PD5);  // Phase B
-  DDRB |= (1 << PB3);               // Phase C high
-  DDRD |= (1 << PD3);               // Phase C low
+  DDRB |= (1 << PB1) | (1 << PB2);  // Phase A (D9 -> HIGH    |  D10 -> LOW)
+  DDRD |= (1 << PD6) | (1 << PD5);  // Phase B (D6 -> HIGH    |  D5  -> LOW)
+  DDRB |= (1 << PB3);               // Phase C high (D11 -> HIGH)
+  DDRD |= (1 << PD3);               // Phase C low  (D3  -> LOW)
 
   cli();
 
@@ -70,10 +70,10 @@ void setup() {
 }
 
 ISR(TIMER1_OVF_vect) {
-  static uint8_t updateCounter = 0;
+  // static uint8_t updateCounter = 0;
 
-  if (++updateCounter < speedDivider) return;
-  updateCounter = 0;
+  // if (++updateCounter < speedDivider) return;
+  // updateCounter = 0;
 
   uint8_t a = pgm_read_byte(&sinTable_64[phaseA]);
   uint8_t b = pgm_read_byte(&sinTable_64[phaseB]);
@@ -91,8 +91,8 @@ ISR(TIMER1_OVF_vect) {
     OCR1B = 0;
     dtA--;
   } else {
-    OCR1A = stateA ? a : 0;
-    OCR1B = stateA ? 0 : (255 - a);
+    OCR1A = stateA ? a : 0;          // positive high cycle (high side mosfet on)
+    OCR1B = stateA ? 0 : (255 - a);  // negative half cycle (low side mosfet on)
   }
   prevA = stateA;
 
@@ -104,8 +104,8 @@ ISR(TIMER1_OVF_vect) {
     OCR0B = 0;
     dtB--;
   } else {
-    OCR0A = stateB ? b : 0;
-    OCR0B = stateB ? 0 : (255 - b);
+    OCR0A = stateB ? b : 0;          // positive high cycle (high side mosfet on)
+    OCR0B = stateB ? 0 : (255 - b);  // negative half cycle (low side mosfet on)
   }
   prevB = stateB;
 
@@ -117,8 +117,8 @@ ISR(TIMER1_OVF_vect) {
     OCR2B = 0;
     dtC--;
   } else {
-    OCR2A = stateC ? c : 0;
-    OCR2B = stateC ? 0 : (255 - c);
+    OCR2A = stateC ? c : 0;          // positive high cycle (high side mosfet on)
+    OCR2B = stateC ? 0 : (255 - c);  // negative half cycle (low side mosfet on)
   }
   prevC = stateC;
 
