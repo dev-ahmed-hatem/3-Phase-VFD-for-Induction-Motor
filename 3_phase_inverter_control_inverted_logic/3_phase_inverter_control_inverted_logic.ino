@@ -43,23 +43,23 @@ void setup() {
 
   // Timer1 → Phase A
   // waveform generation mode: PWM, phase correct, 8-bit
-  // compare output mode: non inverting
-  TCCR1A = (1 << COM1A1) | (1 << COM1B1) | (1 << WGM10);
+  // compare output mode: inverting
+  TCCR1A = (1 << COM1A1) | (1 << COM1A0) | (1 << COM1B1) | (1 << COM1B0) | (1 << WGM10);
   // no prescalar
   TCCR1B = (1 << CS10);
 
   // Timer0 → Phase B
   // waveform generation mode: PWM, phase correct
-  // compare output mode: non inverting
-  TCCR0A = (1 << COM0A1) | (1 << COM0B1) | (1 << WGM00);
+  // compare output mode: inverting
+  TCCR0A = (1 << COM0A1) | (1 << COM0A0) | (1 << COM0B1) | (1 << COM0B0) | (1 << WGM00);
   // no prescalar
   TCCR0B = (1 << CS00);
 
 
   // Timer2 → Phase C + ISR trigger
   // waveform generation mode: PWM, phase correct
-  // compare output mode: non inverting
-  TCCR2A = (1 << COM2A1) | (1 << COM2B1) | (1 << WGM20);
+  // compare output mode: inverting
+  TCCR2A = (1 << COM2A1) | (1 << COM2A0) | (1 << COM2B1) | (1 << COM2B0) | (1 << WGM20);
   // no prescalar
   TCCR2B = (1 << CS20);
 
@@ -91,8 +91,8 @@ ISR(TIMER1_OVF_vect) {
     OCR1B = 0;
     dtA--;
   } else {
-    OCR1A = stateA ? a : 0;          // positive high cycle (high side mosfet on)
-    OCR1B = stateA ? 0 : (255 - a);  // negative half cycle (low side mosfet on)
+    OCR1A = stateA ? (255 - a) : 0;
+    OCR1B = stateA ? 0 : (255 - a);
   }
   prevA = stateA;
 
@@ -104,8 +104,8 @@ ISR(TIMER1_OVF_vect) {
     OCR0B = 0;
     dtB--;
   } else {
-    OCR0A = stateB ? b : 0;          // positive high cycle (high side mosfet on)
-    OCR0B = stateB ? 0 : (255 - b);  // negative half cycle (low side mosfet on)
+    OCR0A = stateB ? (255 - b) : 0;
+    OCR0B = stateB ? 0 : (255 - b);
   }
   prevB = stateB;
 
@@ -117,8 +117,8 @@ ISR(TIMER1_OVF_vect) {
     OCR2B = 0;
     dtC--;
   } else {
-    OCR2A = stateC ? c : 0;          // positive high cycle (high side mosfet on)
-    OCR2B = stateC ? 0 : (255 - c);  // negative half cycle (low side mosfet on)
+    OCR2A = stateC ? (255 - c) : 0;
+    OCR2B = stateC ? 0 : (255 - c);
   }
   prevC = stateC;
 
