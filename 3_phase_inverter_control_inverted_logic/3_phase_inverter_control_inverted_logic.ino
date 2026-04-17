@@ -91,7 +91,7 @@ ISR(TIMER1_OVF_vect) {
     OCR1B = 0;
     dtA--;
   } else {
-    OCR1A = stateA ? (255 - a) : 0;
+    OCR1A = stateA ? a : 0;
     OCR1B = stateA ? 0 : (255 - a);
   }
   prevA = stateA;
@@ -104,7 +104,7 @@ ISR(TIMER1_OVF_vect) {
     OCR0B = 0;
     dtB--;
   } else {
-    OCR0A = stateB ? (255 - b) : 0;
+    OCR0A = stateB ? b : 0;
     OCR0B = stateB ? 0 : (255 - b);
   }
   prevB = stateB;
@@ -117,7 +117,7 @@ ISR(TIMER1_OVF_vect) {
     OCR2B = 0;
     dtC--;
   } else {
-    OCR2A = stateC ? (255 - c) : 0;
+    OCR2A = stateC ? c : 0;
     OCR2B = stateC ? 0 : (255 - c);
   }
   prevC = stateC;
